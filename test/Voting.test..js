@@ -90,16 +90,6 @@ describe("Voting", async function () {
       );
     });
 
-    // it("should emit an event if the owner deposits ethers", async function () {
-    //   let etherQuantity = ethers.parseEther("0.1");
-    //   await expect(bank.deposit({ value: etherQuantity }))
-    //     .to.emit(bank, "Deposit")
-    //     .withArgs(owner.address, etherQuantity);
-
-    //   let balanceOfBank = await ethers.provider.getBalance(bank.target);
-    //   assert.equal(balanceOfBank.toString(), 100000000000000000);
-    // });
-
     it("should emit VoterRegistered event", async function () {
       await expect(voting.addVoter(voter.address))
         .to.emit(voting, "VoterRegistered")
