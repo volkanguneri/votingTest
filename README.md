@@ -11,3 +11,5 @@ REPORT_GAS=true npx hardhat test
 npx hardhat node
 npx hardhat run scripts/deploy.js
 ```
+
+REPORT_GAS=true yarn hardhat test ./test/Storage.js
