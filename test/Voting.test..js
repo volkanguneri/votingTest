@@ -400,12 +400,10 @@ describe("VOTING", async function () {
       await voting.connect(voter1).setVote(2);
       await voting.connect(voter2).setVote(2);
       await voting.endVotingSession();
-      const _winningProposalId = await voting.winningProposalId;
-      console.log(_winningProposalId);
+      // await voting.tallyVotes();
       // expect(winningProposalId).to.equal(2);
 
-      // Use the `expect` function for the assertion
-      expect(winningProposalId).to.equal(2);
+      expect(await voting.tallyVotes()).to.equal("Proposal2");
     });
   });
 });
