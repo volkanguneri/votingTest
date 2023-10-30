@@ -282,12 +282,13 @@ describe("VOTING", async function () {
       ));
 
       await voting.addVoter(owner.address);
+      await voting.addVoter(voter1.address);
       await voting.startProposalsRegistering();
     });
 
     it("Should NOT vote if not registered as voter", async function () {
       // 0 is the index of 'GENESIS' proposal;
-      await expect(voting.connect(voter1).setVote(0)).to.be.revertedWith(
+      await expect(voting.connect(voter2).setVote(0)).to.be.revertedWith(
         "You're not a voter"
       );
     });
@@ -336,20 +337,20 @@ describe("VOTING", async function () {
       assert.equal(votedProposalId, 1);
     });
 
-    // it("More than one voter should vote for the same proposal", async function () {
-    //   const anyProposal_01 = "Any proposal but not an empty string";
-    //   const anyProposal_02 = "Any other proposal but not an empty string";
-    //   await voting.addProposal(anyProposal_01);
-    //   await voting.addProposal(anyProposal_02);
-    //   await voting.endProposalsRegistering();
-    //   await voting.startVotingSession();
-    //   await voting.setVote(1);
-    //   await voting.connect(voter1).setVote(1);
-    //   let [isRegistered, hasVoted, votedProposalId] = await voting.getVoter(
-    //     owner.address
-    //   );
-    //   assert.equal(votedProposalId, 1);
-    // });
+    it("More than one voter should vote for the same proposal", async function () {
+      const anyProposal_01 = "Any proposal but not an empty string";
+      const anyProposal_02 = "Any other proposal but not an empty string";
+      await voting.addProposal(anyProposal_01);
+      await voting.addProposal(anyProposal_02);
+      await voting.endProposalsRegistering();
+      await voting.startVotingSession();
+      await voting.setVote(1);
+      await voting.connect(voter1).setVote(1);
+      let [isRegistered, hasVoted, votedProposalId] = await voting.getVoter(
+        owner.address
+      );
+      assert.equal(votedProposalId, 1);
+    });
 
     it("Should emit Voted event", async function () {
       const anyProposal = "Any proposal but not an empty string";
@@ -361,6 +362,8 @@ describe("VOTING", async function () {
         .withArgs(owner.address, 1);
     });
   });
+
+  // :::::::::::::::::::::::::::::::::TALLY VOTES::::::::::::::::::::::::::::::::::::::
 
   describe("TALLY VOTES FUNCTION", async function () {
     beforeEach(async function () {
@@ -395,15 +398,14 @@ describe("VOTING", async function () {
       ).to.be.revertedWithCustomError(voting, "OwnableUnauthorizedAccount");
     });
 
-    it("Should tally votes", async function () {
+    it("Should change workflow status to VotesTallied", async function () {
       await voting.setVote(1);
       await voting.connect(voter1).setVote(2);
       await voting.connect(voter2).setVote(2);
       await voting.endVotingSession();
-      // await voting.tallyVotes();
-      // expect(winningProposalId).to.equal(2);
-
-      expect(await voting.tallyVotes()).to.equal("Proposal2");
+      await expect(voting.tallyVotes())
+        .to.emit(voting, "WorkflowStatusChange")
+        .withArgs(4, 5);
     });
   });
 });
